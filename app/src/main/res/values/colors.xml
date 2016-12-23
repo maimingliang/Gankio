@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#1379d6</color>
+    <color name="colorPrimaryDark">#1079d6</color>
+    <color name="colorAccent">#FF4081</color>
+
+    <color name="theme_bg_white">#ffffff</color>
+    <color name="theme_window_background">#FFF5F5F5</color>
+    <color name="colorBlueDark">#1379d6</color>
+    <color name="textBlueDark">#1379d6</color>
+
+    <color name="textWhite">#ffffff</color>
+
+    <color name="theme_text_black">#333</color>
+    <color name="theme_bg_line_gray">#eeeeee</color>
+    <color name="gray_888888">#888888</color>
+</resources>
