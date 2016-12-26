@@ -4,7 +4,9 @@ import android.content.Context;
 import android.widget.Toast;
 
 
+import com.trello.rxlifecycle.components.support.RxAppCompatActivity;
 
+import java.lang.ref.SoftReference;
 import java.net.ConnectException;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
@@ -18,25 +20,17 @@ import rx.Subscriber;
  * 调用者自己对请求数据进行处理
  * Created by
  */
-public class ProgressSubscriber<T> extends Subscriber<T> {
+public class ProgressSubscriber<T> extends BaseSubscriber<T> {
 
     private static final String TAG = "ProgressSubscriber";
 
-    private SubscriberOnNextListener mSubscriberOnNextListener;
+
     private DialogListener mDialogListener;
-    private Context context;
 
-
-    public ProgressSubscriber(Context context,SubscriberOnNextListener mSubscriberOnNextListener) {
-        this.mSubscriberOnNextListener = mSubscriberOnNextListener;
-        this.context = context;
-    }
-
-    public ProgressSubscriber(Context context,SubscriberOnNextListener mSubscriberOnNextListener,DialogListener mDialogListener) {
-        this.mSubscriberOnNextListener = mSubscriberOnNextListener;
-        this.mDialogListener = mDialogListener;
-        this.context = context;
-    }
+    public ProgressSubscriber(Context context, String method,SubscriberOnNextListener mSubscriberOnNextListener,DialogListener mDialogListener) {
+         super(context,method,mSubscriberOnNextListener);
+         this.mDialogListener = mDialogListener;
+     }
 
 
     /**
@@ -65,6 +59,12 @@ public class ProgressSubscriber<T> extends Subscriber<T> {
     @Override
     public void onError(Throwable e) {
 
+        Context context = mActivity.get();
+
+        if(context == null){
+            return;
+        }
+
         if (e instanceof SocketTimeoutException) {
             Toast.makeText(context, "网络中断，请检查您的网络状态", Toast.LENGTH_SHORT).show();
         } else if (e instanceof ConnectException) {
@@ -77,6 +77,9 @@ public class ProgressSubscriber<T> extends Subscriber<T> {
             Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
         }
 
+        if(mSubscriberOnNextListener.get() != null){
+            mSubscriberOnNextListener.get().onError(e);
+        }
     }
 
     /**
@@ -86,10 +89,12 @@ public class ProgressSubscriber<T> extends Subscriber<T> {
      */
     @Override
     public void onNext(T t) {
-        if (mSubscriberOnNextListener != null) {
-            mSubscriberOnNextListener.onNext(t);
+        if (mSubscriberOnNextListener.get() != null) {
+            mSubscriberOnNextListener.get().onNext(t);
         }
     }
+
+
 
     /**
      * 取消ProgressDialog的时候，取消对observable的订阅，同时也取消了http请求

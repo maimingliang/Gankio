@@ -21,6 +21,8 @@ public class App extends Application {
 
     private static Context instance;
 
+    public final static boolean IS_CACHE = false;
+    public final static String  SERVER_ADDRESS = "http://gank.io/api/";
     @Override
     public void onCreate() {
         super.onCreate();

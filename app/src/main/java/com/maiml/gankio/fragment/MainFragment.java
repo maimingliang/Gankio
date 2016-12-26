@@ -22,7 +22,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 
 
-public class MainFragment extends Fragment {
+public class MainFragment extends BaseLazyFragment {
 
 
     @Bind(R.id.tab_layout)
@@ -33,7 +33,6 @@ public class MainFragment extends Fragment {
     LinearLayout llContent;
     @Bind(R.id.fab_button)
     FloatingActionButton fabButton;
-    private Activity activity;
 
     public static MainFragment newInstance() {
         return new MainFragment();
@@ -41,22 +40,16 @@ public class MainFragment extends Fragment {
 
 
     @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        activity = (Activity) context;
-    }
-
-    @Nullable
-    @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-
-
-        View view = inflater.inflate(R.layout.fragment_main, container, false);
-
-        ButterKnife.bind(this, view);
+    protected void initViewsAndEvents() {
         initData();
-        return view;
     }
+
+    @Override
+    protected int getContentViewLayoutID() {
+        return R.layout.fragment_main;
+    }
+
+
 
     private void initData() {
         tabLayout.addTab(tabLayout.newTab());
@@ -69,11 +62,8 @@ public class MainFragment extends Fragment {
         tabLayout.setupWithViewPager(viewPager);
     }
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        ButterKnife.unbind(this);
-    }
+
+
 
     public class MainFragmentAdapter extends FragmentPagerAdapter {
         private String[] mTab = new String[]{"福利", "Android","iOS","休息视频","拓展资源","前端"};

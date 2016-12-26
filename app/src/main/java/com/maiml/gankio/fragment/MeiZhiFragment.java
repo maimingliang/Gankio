@@ -36,7 +36,7 @@ import me.fangx.haorefresh.HaoRecyclerView;
 import me.fangx.haorefresh.LoadMoreListener;
 
 
-public class MeiZhiFragment extends Fragment implements IMainView{
+public class MeiZhiFragment extends BaseLazyFragment implements IMainView{
 
 
     @Bind(R.id.recycleview)
@@ -44,9 +44,11 @@ public class MeiZhiFragment extends Fragment implements IMainView{
     @Bind(R.id.swiperefresh)
     SwipeRefreshLayout swiperefresh;
 
+    @Bind(R.id.root_view)
+    FrameLayout rootView;
     private FloatingActionButton fabButton;
     private List<GankIoBean> datas = new ArrayList<>();
-    private Activity activity;
+
     private MeiZhiListAdapter mainListAdapter;
 
     @Inject
@@ -72,29 +74,9 @@ public class MeiZhiFragment extends Fragment implements IMainView{
         return fragment;
     }
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
 
-    }
 
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        activity = (Activity) context;
-    }
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_mei_zhi, container, false);
-        ButterKnife.bind(this, view);
-        ComponentHolder.getAppComponent().inject(this);
-        initData();
-        setListener();
-        return view;
-    }
 
     private void setListener() {
         swiperefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -117,8 +99,8 @@ public class MeiZhiFragment extends Fragment implements IMainView{
         swiperefresh.setColorSchemeResources(R.color.textBlueDark, R.color.textBlueDark, R.color.textBlueDark,
                 R.color.textBlueDark);
 
-        mainPresenter = new MainPresenter(activity,this,dataManager);
-        mainListAdapter = new MeiZhiListAdapter(activity,datas);
+        mainPresenter = new MainPresenter(mContext,this,dataManager);
+        mainListAdapter = new MeiZhiListAdapter(mContext,datas);
 
         recycleview.setAdapter(mainListAdapter);
 
@@ -141,7 +123,7 @@ public class MeiZhiFragment extends Fragment implements IMainView{
 //        progressBar.setLayoutParams(lp);
 //        recycleview.setFootLoadingView(progressBar);
 
-         TextView textView = new TextView(activity);
+         TextView textView = new TextView(mContext);
         textView.setText("已经到底啦~");
         recycleview.setFootEndView(textView);
 
@@ -151,12 +133,24 @@ public class MeiZhiFragment extends Fragment implements IMainView{
 
 
 
+    @Override
+    protected void initViewsAndEvents() {
+        ComponentHolder.getAppComponent().inject(this);
+        initData();
+        setListener();
+    }
 
     @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        ButterKnife.unbind(this);
+    protected int getContentViewLayoutID() {
+        return R.layout.fragment_mei_zhi;
     }
+
+    @Override
+    protected View getLoadingTargetView() {
+        return  rootView;
+    }
+
+
 
     @Override
     public void notifyDataChange(List<GankIoBean> list, SearchType searchType) {

@@ -5,7 +5,9 @@ import android.content.Context;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.maiml.gankio.App;
 import com.maiml.gankio.http.DataManager;
+import com.maiml.gankio.http.intercepter.PostCacheIntercepter;
 import com.maiml.gankio.utils.FileUtils;
 import com.maiml.gankio.utils.LogUtil;
 import com.maiml.gankio.utils.NetworkUtil;
@@ -49,48 +51,7 @@ public class AppModule {
 
     @Provides
     Interceptor providesIntercepter(){
-        return new Interceptor() {
-            @Override
-            public Response intercept(Chain chain) throws IOException {
-                Request request = chain.request();
-
-
-                HttpUrl url = request.url();
-
-                LogUtil.i("请求头信息 start " );
-                LogUtil.i("url = " + url.toString());
-                LogUtil.i("request headers = " + request.headers().toString());
-                LogUtil.i("请求头信息 end " );
-
-                //更改请求头
-                if (!NetworkUtil.isNetWorkActive(mContext)){
-                    //如果没有网络，那么就强制使用缓存数据
-                    request = request.newBuilder()
-                            .cacheControl(CacheControl.FORCE_CACHE)
-                            .build();
-                }
-                //获得返回头，如果有网络，就缓存一分钟,没有网络缓存四周
-                Response originalResponse = chain.proceed(request);
-
-
-                LogUtil.i("响应头信息  start ");
-                LogUtil.i("response headers = " + originalResponse.headers().toString());
-                LogUtil.i("response body = "+originalResponse.body().toString());
-                LogUtil.i("响应头信息  end ");
-
-                 //更改响应头
-                if (NetworkUtil.isNetWorkActive(mContext)){
-                    String cacheControl = request.cacheControl().toString();
-                    return originalResponse.newBuilder()
-                            .header("Cache-Control", cacheControl)
-                             .build();
-                }else {
-                    return originalResponse.newBuilder()
-                            .header("Cache-Control", "public,max-age=2419200")
-                             .build();
-                }
-            }
-        };
+        return new PostCacheIntercepter(App.IS_CACHE);
     }
 
     @Provides
@@ -108,6 +69,7 @@ public class AppModule {
         OkHttpClient okhttpClient = new OkHttpClient.Builder()
                 .connectTimeout(30, TimeUnit.SECONDS)
                 .retryOnConnectionFailure(true) //设置出现错误进行重新连接。
+
                 .connectTimeout(15, TimeUnit.SECONDS)
                 .readTimeout(60 * 1000, TimeUnit.MILLISECONDS)
                 .addInterceptor(new Interceptor() {
@@ -119,8 +81,7 @@ public class AppModule {
                                 .build());
                     }
                 })   //拦截器
-                .addNetworkInterceptor(interceptor)
-                .addInterceptor(interceptor)
+                 .addInterceptor(interceptor)
                 .cache(providesCache())
                 .build();
 
@@ -138,7 +99,7 @@ public class AppModule {
 
         Retrofit retrofit = new Retrofit.Builder()
                 .client(okhttpClient)
-                .baseUrl("http://gank.io/api/")
+                .baseUrl(App.SERVER_ADDRESS)
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .build();

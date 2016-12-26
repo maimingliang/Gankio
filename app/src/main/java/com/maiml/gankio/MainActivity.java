@@ -20,7 +20,9 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.maiml.gankio.fragment.BaseLazyFragment;
 import com.maiml.gankio.fragment.MainFragment;
+import com.maiml.gankio.netstatus.NetUtils;
 import com.maiml.gankio.utils.LogUtil;
 
 import java.util.ArrayList;
@@ -54,19 +56,17 @@ public class MainActivity extends BaseActivity {
     FrameLayout homeLayout;
 
 
-
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        ButterKnife.bind(this);
+    protected void initViewsAndEvents() {
         initData();
     }
 
     @Override
-    protected boolean isApplyStatusBarTranslucency() {
-        return false;
+    protected int getContentViewLayoutID() {
+        return R.layout.activity_main;
     }
+
+
 
     private void initData() {
 

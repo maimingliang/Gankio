@@ -41,6 +41,10 @@ public class IOSFragment extends Fragment implements IMainView{
     SwipeRefreshLayout swiperefresh;
 
     private FloatingActionButton fabButton;
+
+
+
+
     private List<GankIoBean> datas = new ArrayList<>();
     private Activity activity;
     private MainListAdapter mainListAdapter;
@@ -91,6 +95,7 @@ public class IOSFragment extends Fragment implements IMainView{
         setListener();
         return view;
     }
+
 
     private void setListener() {
         swiperefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {

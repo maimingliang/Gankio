@@ -6,11 +6,13 @@ import com.maiml.gankio.View.IMainView;
 import com.maiml.gankio.bean.GankIoBean;
 import com.maiml.gankio.common.SearchType;
 import com.maiml.gankio.http.DataManager;
+import com.maiml.gankio.http.rx.NormalSubscriber;
 import com.maiml.gankio.http.rx.ProgressSubscriber;
 import com.maiml.gankio.http.rx.SubscriberOnNextListener;
 import com.maiml.gankio.utils.LogUtil;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by maimingliang on 2016/12/22.
@@ -44,7 +46,9 @@ public class MainPresenter {
                 iMainView.notifyDataChange(gankIoBeen,searchType);
             }
         };
-        dataManager.findList(iMainView.getCategory(),page * PAGE_SIZE,new ProgressSubscriber<List<GankIoBean>>(context,s));
+
+
+        dataManager.findList(iMainView.getCategory(),page * PAGE_SIZE,new NormalSubscriber<List<GankIoBean>>(context,"random/data",s));
 
     }
 
