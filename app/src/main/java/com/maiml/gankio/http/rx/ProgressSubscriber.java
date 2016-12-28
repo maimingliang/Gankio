@@ -94,6 +94,10 @@ public class ProgressSubscriber<T> extends BaseSubscriber<T> {
         }
     }
 
+    @Override
+    public void onCacheNext(String s) {
+
+    }
 
 
     /**

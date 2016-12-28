@@ -1,16 +1,23 @@
 package com.maiml.gankio.http.intercepter;
 
 import com.maiml.gankio.App;
+import com.maiml.gankio.CookieDbUtil;
 import com.maiml.gankio.utils.LogUtil;
 import com.maiml.gankio.utils.NetworkUtil;
 
 import java.io.IOException;
+import java.lang.reflect.Method;
+import java.nio.charset.Charset;
 
 import okhttp3.CacheControl;
 import okhttp3.HttpUrl;
 import okhttp3.Interceptor;
+import okhttp3.MediaType;
 import okhttp3.Request;
 import okhttp3.Response;
+import okhttp3.ResponseBody;
+import okio.Buffer;
+import okio.BufferedSource;
 
 /**
  * Created by maimingliang on 2016/12/26.
@@ -20,15 +27,23 @@ import okhttp3.Response;
 
 public class GetCacheIntercepter implements Interceptor {
 
+    private CookieDbUtil dbUtil;
+
+
+    public GetCacheIntercepter() {
+        dbUtil=CookieDbUtil.getInstance();
+
+    }
     @Override
     public Response intercept(Chain chain) throws IOException {
         Request request = chain.request();
 
 
-        HttpUrl url = request.url();
+        HttpUrl urlStr = request.url();
 
         LogUtil.i("请求头信息 start ");
-        LogUtil.i("url = " + url.toString());
+        LogUtil.i("url = " + urlStr.toString());
+        LogUtil.i("method = " + request.method());
 //                LogUtil.i("request headers = " + request.headers().toString());
         LogUtil.i("请求头信息 end ");
 
@@ -42,6 +57,35 @@ public class GetCacheIntercepter implements Interceptor {
         //获得返回头，如果有网络，就缓存一分钟,没有网络缓存四周
         Response originalResponse = chain.proceed(request);
 
+
+        if(request.method().equals("POST") && originalResponse.isSuccessful()){
+
+            ResponseBody body = originalResponse.body();
+            BufferedSource source = body.source();
+            source.request(Long.MAX_VALUE); // Buffer the entire body.
+            Buffer buffer = source.buffer();
+            Charset charset = Charset.defaultCharset();
+            MediaType contentType = body.contentType();
+            if (contentType != null) {
+                charset = contentType.charset(charset);
+            }
+            String bodyString = buffer.clone().readString(charset);
+            String url ="http://maimingliang.me/api";
+            CookieResult result = dbUtil.queryCookieBy(url);
+            long time = System.currentTimeMillis();
+            /*保存和更新本地数据*/
+            if (result == null) {
+                result = new CookieResult(url, bodyString, time);
+                dbUtil.saveCookie(result);
+            } else {
+                result.setResulte(bodyString);
+                result.setTime(time);
+                dbUtil.updateCookie(result);
+            }
+
+            return originalResponse;
+
+        }
 
 //                LogUtil.i("响应头信息  start ");
 //                LogUtil.i("response headers = " + originalResponse.headers().toString());

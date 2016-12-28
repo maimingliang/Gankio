@@ -15,7 +15,6 @@ import rx.Subscriber;
 /**
  * Created by maimingliang on 2016/12/26.
  */
-
 public abstract class BaseSubscriber<T> extends Subscriber<T> {
 
     /* 软引用回调接口*/
@@ -41,23 +40,5 @@ public abstract class BaseSubscriber<T> extends Subscriber<T> {
     }
 
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        /*缓存并且有网*/
-        if (App.IS_CACHE && NetworkUtil.isNetWorkActive(App.getInstance())) {
-             /*获取缓存数据*/
-            CookieResult cookieResulte = CookieDbUtil.getInstance().queryCookieBy(App.SERVER_ADDRESS+method);
-            if (cookieResulte != null) {
-                long time = (System.currentTimeMillis() - cookieResulte.getTime()) / 1000;
-                if (time < 60) {
-                    if (mSubscriberOnNextListener.get() != null) {
-                        mSubscriberOnNextListener.get().onCacheNext(cookieResulte.getResulte());
-                    }
-                    onCompleted();
-                    unsubscribe();
-                }
-            }
-        }
-    }
+    public abstract void onCacheNext(String s);
 }

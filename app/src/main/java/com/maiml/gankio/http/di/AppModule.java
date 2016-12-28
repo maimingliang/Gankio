@@ -7,6 +7,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.maiml.gankio.App;
 import com.maiml.gankio.http.DataManager;
+import com.maiml.gankio.http.intercepter.GetCacheIntercepter;
 import com.maiml.gankio.http.intercepter.PostCacheIntercepter;
 import com.maiml.gankio.utils.FileUtils;
 import com.maiml.gankio.utils.LogUtil;
@@ -51,7 +52,7 @@ public class AppModule {
 
     @Provides
     Interceptor providesIntercepter(){
-        return new PostCacheIntercepter(App.IS_CACHE);
+        return new GetCacheIntercepter();
     }
 
     @Provides
@@ -59,7 +60,6 @@ public class AppModule {
         File httpCacheFile = FileUtils.getDiskCacheDir("response");
         return new Cache(httpCacheFile, 1024 * 100 * 1024);
     }
-
 
 
     @Provides
@@ -82,6 +82,7 @@ public class AppModule {
                     }
                 })   //拦截器
                  .addInterceptor(interceptor)
+                .addNetworkInterceptor(interceptor)
                 .cache(providesCache())
                 .build();
 

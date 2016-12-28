@@ -93,7 +93,6 @@ public class CookieDbUtil {
         downInfoDao.delete(info);
     }
 
-
     public CookieResult queryCookieBy(String  url) {
         DaoMaster daoMaster = new DaoMaster(getReadableDatabase());
         DaoSession daoSession = daoMaster.newSession();

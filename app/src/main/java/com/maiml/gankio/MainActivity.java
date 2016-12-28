@@ -20,6 +20,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.maiml.gankio.View.SimpleDelegate;
+import com.maiml.gankio.base.ActivityPresenter;
 import com.maiml.gankio.fragment.BaseLazyFragment;
 import com.maiml.gankio.fragment.MainFragment;
 import com.maiml.gankio.netstatus.NetUtils;
@@ -30,100 +32,26 @@ import java.util.ArrayList;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
-public class MainActivity extends BaseActivity {
+public class MainActivity extends ActivityPresenter<SimpleDelegate> {
 
-    @Bind(R.id.toolbar)
-    Toolbar toolbar;
-    @Bind(R.id.content)
-    FrameLayout content;
-    @Bind(R.id.user_img)
-    ImageView userImg;
-    @Bind(R.id.tv_name)
-    TextView tvName;
-    @Bind(R.id.tv_autograph)
-    TextView tvAutograph;
-    @Bind(R.id.tv_change_theme)
-    TextView tvChangeTheme;
-    @Bind(R.id.tv_setting)
-    TextView tvSetting;
-    @Bind(R.id.nv_drawer_layout)
-    LinearLayout nvDrawerLayout;
-    @Bind(R.id.drawer_layout)
-    DrawerLayout drawerLayout;
-    @Bind(R.id.mengban_view)
-    ImageView mengbanView;
-    @Bind(R.id.home_layout)
-    FrameLayout homeLayout;
 
 
     @Override
-    protected void initViewsAndEvents() {
-        initData();
+    protected void bindEvenListener() {
+        super.bindEvenListener();
     }
+
 
     @Override
-    protected int getContentViewLayoutID() {
-        return R.layout.activity_main;
-    }
-
-
-
-    private void initData() {
-
-        Glide.with(this).load("http://fxblog.oss-cn-beijing.aliyuncs.com/avatar_img.png").placeholder(R.mipmap.ic_launcher).into(userImg);
-        tvName.setText("潘金莲");
-        tvSetting.setText("设置");
-        tvChangeTheme.setText("切换主题");
-        tvAutograph.setText("啦啦啦");
-        setSupportActionBar(toolbar);
-        setupToolbar();
-        setFragment();
-    }
-
-    private void setupToolbar() {
-        final ActionBar ab = getSupportActionBar();
-        ab.setHomeAsUpIndicator(R.drawable.ic_menu);
-        ab.setTitle("首页");
-        ab.setDisplayHomeAsUpEnabled(true);
-    }
-
-
-
-    private void setFragment() {
-
-        Fragment fragment = MainFragment.newInstance();
-        if (fragment != null) {
-            FragmentManager fragmentManager = getSupportFragmentManager();
-            fragmentManager.beginTransaction()
-                    .replace(R.id.content, fragment).commit();
-            closeDrawer();
-        } else {
-            LogUtil.e(" fragment is null");
-        }
-    }
-    protected void openDrawer() {
-        if (drawerLayout == null)
-            return;
-        drawerLayout.openDrawer(GravityCompat.START);
-    }
-
-    protected void closeDrawer() {
-        if (drawerLayout == null)
-            return;
-        drawerLayout.closeDrawer(GravityCompat.START);
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.sample_actions, menu);
-        return true;
+    protected Class getDelegateClass() {
+        return SimpleDelegate.class;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                openDrawer();
+                 viewDelegate.openDrawer();
                 return true;
             case R.id.action_settings:
 //                Bundle extras = new Bundle();

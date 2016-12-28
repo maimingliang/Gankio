@@ -118,7 +118,7 @@ public class IOSFragment extends Fragment implements IMainView{
         swiperefresh.setColorSchemeResources(R.color.textBlueDark, R.color.textBlueDark, R.color.textBlueDark,
                 R.color.textBlueDark);
 
-        mainPresenter = new MainPresenter(activity,this,dataManager);
+         mainPresenter = new MainPresenter(activity,this,dataManager);
         mainListAdapter = new MainListAdapter(activity,datas);
 
         recycleview.setAdapter(mainListAdapter);

@@ -96,11 +96,11 @@ public abstract class BaseActivity extends RxAppCompatActivity {
 
         AppManager.getInstance().addActivity(this);
 
-        if (getContentViewLayoutID() != 0) {
-            setContentView(getContentViewLayoutID());
-        } else {
-            throw new IllegalArgumentException("You must return a right contentView layout resource Id");
-        }
+//        if (getContentViewLayoutID() != 0) {
+//            setContentView(getContentViewLayoutID());
+//        } else {
+//            throw new IllegalArgumentException("You must return a right contentView layout resource Id");
+//        }
 
         mNetChangeObserver = new NetChangeObserver() {
             @Override
@@ -122,14 +122,14 @@ public abstract class BaseActivity extends RxAppCompatActivity {
 
 
 //
-        initViewsAndEvents();
+//        initViewsAndEvents();
 
     }
 
     @Override
     public void setContentView(int layoutResID) {
         super.setContentView(layoutResID);
-        ButterKnife.bind(this);
+//        ButterKnife.bind(this);
         if (null != getLoadingTargetView()) {
             mVaryViewHelperController = new VaryViewHelperController(getLoadingTargetView());
         }
@@ -166,7 +166,7 @@ public abstract class BaseActivity extends RxAppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        ButterKnife.unbind(this);
+//        ButterKnife.unbind(this);
         NetStateReceiver.unRegisterNetworkStateReceiver(mContext);
         NetStateReceiver.removeRegisterObserver(mNetChangeObserver);
 
@@ -175,10 +175,7 @@ public abstract class BaseActivity extends RxAppCompatActivity {
         }
     }
 
-    /**
-     * init all views and add events
-     */
-    protected abstract void initViewsAndEvents();
+
     /**
      * get loading target view
      */
@@ -198,12 +195,7 @@ public abstract class BaseActivity extends RxAppCompatActivity {
     protected  void onNetworkDisConnected(){
 
     }
-    /**
-     * bind layout resource file
-     *
-     * @return id of layout resource
-     */
-    protected abstract int getContentViewLayoutID();
+
     /**
      * is applyStatusBarTranslucency
      *

@@ -2,10 +2,13 @@ package com.maiml.gankio.presenter;
 
 import android.content.Context;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.maiml.gankio.View.IMainView;
 import com.maiml.gankio.bean.GankIoBean;
 import com.maiml.gankio.common.SearchType;
 import com.maiml.gankio.http.DataManager;
+import com.maiml.gankio.http.HttpResult;
 import com.maiml.gankio.http.rx.NormalSubscriber;
 import com.maiml.gankio.http.rx.ProgressSubscriber;
 import com.maiml.gankio.http.rx.SubscriberOnNextListener;
@@ -44,6 +47,16 @@ public class MainPresenter {
             @Override
             public void onNext(List<GankIoBean> gankIoBeen) {
                 iMainView.notifyDataChange(gankIoBeen,searchType);
+            }
+
+            @Override
+            public void onCacheNext(String string) {
+
+                Gson gson = new Gson();
+                HttpResult<List<GankIoBean>> list = gson.fromJson(string, new TypeToken<HttpResult<List<GankIoBean>>>() {
+                }.getType());
+                iMainView.notifyDataChange(list.getResults(),searchType);
+
             }
         };
 

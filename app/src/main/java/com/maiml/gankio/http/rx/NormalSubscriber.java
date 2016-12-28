@@ -6,6 +6,7 @@ import android.widget.Toast;
 import com.maiml.gankio.App;
 import com.maiml.gankio.CookieDbUtil;
 import com.maiml.gankio.http.intercepter.CookieResult;
+import com.maiml.gankio.utils.LogUtil;
 
 import java.net.ConnectException;
 import java.net.SocketException;
@@ -27,6 +28,13 @@ public class NormalSubscriber<T> extends BaseSubscriber<T> {
     }
 
     @Override
+    public void onCacheNext(String s) {
+        if(mSubscriberOnNextListener.get() != null){
+            mSubscriberOnNextListener.get().onCacheNext(s);
+        }
+    }
+
+    @Override
     public void onStart() {
         super.onStart();
     }
@@ -42,41 +50,9 @@ public class NormalSubscriber<T> extends BaseSubscriber<T> {
      */
     @Override
     public void onError(Throwable e) {
+//        http://gank.io/api/random/data/Android/10
+        doError(e);
 
-          /*需要緩存并且本地有缓存才返回*/
-        if (App.IS_CACHE) {
-            Observable.just(App.SERVER_ADDRESS+method).subscribe(new Subscriber<String>() {
-                @Override
-                public void onCompleted() {
-
-                }
-
-                @Override
-                public void onError(Throwable e) {
-                    doError(e);
-                }
-
-                @Override
-                public void onNext(String s) {
-                    /*获取缓存数据*/
-                    CookieResult cookieResulte = CookieDbUtil.getInstance().queryCookieBy(s);
-                    if (cookieResulte == null) {
-                        throw new ApiException("网络错误");
-                    }
-                    long time = (System.currentTimeMillis() - cookieResulte.getTime()) / 1000;
-                    if (time < 60) {
-                        if (mSubscriberOnNextListener.get() != null) {
-                            mSubscriberOnNextListener.get().onCacheNext(cookieResulte.getResulte());
-                        }
-                    } else {
-                        CookieDbUtil.getInstance().deleteCookie(cookieResulte);
-                        throw new ApiException("网络错误");
-                    }
-                }
-            });
-        } else {
-            doError(e);
-        }
 
     }
 
@@ -111,6 +87,7 @@ public class NormalSubscriber<T> extends BaseSubscriber<T> {
      */
     @Override
     public void onNext(T t) {
+
         if (mSubscriberOnNextListener.get() != null) {
             mSubscriberOnNextListener.get().onNext(t);
         }
